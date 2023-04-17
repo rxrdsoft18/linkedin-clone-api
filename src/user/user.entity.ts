@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { RoleEnum } from './role.enum';
+import { FeedPostEntity } from "../feed/entities/feed-post.entity";
 
-@Entity()
+@Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -24,8 +25,8 @@ export class UserEntity {
   @Column({ type: 'enum', enum: RoleEnum, default: RoleEnum.USER })
   role: RoleEnum;
 
-  // @OneToMany(() => FeedPostEntity, (feedPostEntity) => feedPostEntity.author)
-  // feedPosts: FeedPostEntity[];
+  @OneToMany(() => FeedPostEntity, (feedPostEntity) => feedPostEntity.author)
+  feedPosts: FeedPostEntity[];
   //
   // @OneToMany(
   //   () => FriendRequestEntity,

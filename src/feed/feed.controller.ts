@@ -5,13 +5,17 @@ import {
   Get,
   Param,
   Post,
-  Put, Query,
+  Put,
+  Query,
+  Req,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { CreateFeedPostDto } from './dtos/create-feed-post.dto';
 import { UpdateFeedPostDto } from './dtos/update-feed-post.dto';
-import {FindOptionsDto} from "./dtos/find-options.dto";
+import { FindOptionsDto } from './dtos/find-options.dto';
+import { JwtGuard } from '../auth/jwt.guard';
 
 @Controller('feed')
 export class FeedController {
@@ -23,14 +27,19 @@ export class FeedController {
   // }
 
   @Get()
+  @UseGuards(JwtGuard)
   async findSelected(@Query() findOptions: FindOptionsDto) {
     console.log(findOptions);
     return this.feedService.findPost(findOptions);
   }
 
   @Post()
-  async create(@Body(ValidationPipe) createFeedPostDto: CreateFeedPostDto) {
-    return this.feedService.create(createFeedPostDto);
+  @UseGuards(JwtGuard)
+  async create(
+    @Body(ValidationPipe) createFeedPostDto: CreateFeedPostDto,
+    @Req() req,
+  ) {
+    return this.feedService.create(createFeedPostDto, req.user);
   }
 
   @Put(':id')

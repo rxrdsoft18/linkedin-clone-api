@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateFeedPostDto } from './dtos/create-feed-post.dto';
 import { UpdateFeedPostDto } from './dtos/update-feed-post.dto';
 import { FindOptionsDto } from './dtos/find-options.dto';
+import { UserInterface } from "../user/user.interface";
 
 @Injectable()
 export class FeedService {
@@ -34,8 +35,12 @@ export class FeedService {
     return this.feedPostRepository.findOneBy({ id });
   }
 
-  async create(createFeedPostDto: CreateFeedPostDto) {
-    return this.feedPostRepository.save(createFeedPostDto);
+  async create(
+    createFeedPostDto: Readonly<CreateFeedPostDto>,
+    user: UserInterface,
+  ) {
+    delete user.password;
+    return this.feedPostRepository.save({ ...createFeedPostDto, author: user });
   }
 
   async update(id: number, updateFeedPostDto: UpdateFeedPostDto) {
