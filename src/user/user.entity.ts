@@ -19,8 +19,8 @@ export class UserEntity {
   @Column({ select: false })
   password: string;
 
-  // @Column({ nullable: true })
-  // imagePath: string;
+  @Column({ nullable: true })
+  imagePath: string;
 
   @Column({ type: 'enum', enum: RoleEnum, default: RoleEnum.USER })
   role: RoleEnum;

@@ -14,12 +14,12 @@ export class FeedService {
     private readonly feedPostRepository: Repository<FeedPostEntity>,
   ) {}
 
-  async findAll(findOptions: FindOptionsDto) {
-    const { take, skip } = findOptions;
-    const takeValue = take > 20 ? 20 : take;
-
-    return this.feedPostRepository.find();
-  }
+  // async findAll(findOptions: FindOptionsDto) {
+  //   const { take, skip } = findOptions;
+  //   const takeValue = take > 20 ? 20 : take;
+  //
+  //   return this.feedPostRepository.find();
+  // }
 
   findPost(findOptions: FindOptionsDto) {
     const { take, skip } = findOptions;

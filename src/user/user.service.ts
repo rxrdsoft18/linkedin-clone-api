@@ -35,4 +35,15 @@ export class UserService {
     delete userCreated.password;
     return userCreated;
   }
+
+  async updateUserImageById(id: number, imagePath: string) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    user.imagePath = imagePath;
+    return this.userRepository.save(user);
+  }
+
+  async findImageNameByUserId(id: number) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    return user.imagePath;
+  }
 }
