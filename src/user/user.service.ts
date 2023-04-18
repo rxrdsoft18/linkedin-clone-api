@@ -14,7 +14,14 @@ export class UserService {
   async findByEmail(email: string) {
     return this.userRepository.findOne({
       where: { email },
-      select: ['id', 'firstName', 'lastName', 'email', 'password'],
+      select: ['id', 'firstName', 'lastName', 'email', 'password', 'role'],
+    });
+  }
+
+  async findById(id: number) {
+    return this.userRepository.findOne({
+      where: { id },
+      relations: ['feedPosts'],
     });
   }
 

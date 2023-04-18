@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateFeedPostDto } from './dtos/create-feed-post.dto';
 import { UpdateFeedPostDto } from './dtos/update-feed-post.dto';
 import { FindOptionsDto } from './dtos/find-options.dto';
-import { UserInterface } from "../user/user.interface";
+import { UserInterface } from '../user/user.interface';
 
 @Injectable()
 export class FeedService {
@@ -24,15 +24,26 @@ export class FeedService {
   findPost(findOptions: FindOptionsDto) {
     const { take, skip } = findOptions;
     const takeValue = take > 20 ? 20 : take;
+    // return this.feedPostRepository
+    //   .findAndCount({ take: takeValue, skip })
+    //   .then(([posts]) => {
+    //     return posts;
+    //   });
+
     return this.feedPostRepository
-      .findAndCount({ take: takeValue, skip })
-      .then(([posts]) => {
-        return posts;
-      });
+      .createQueryBuilder('posts')
+      .leftJoinAndSelect('posts.author', 'author')
+      .orderBy('posts.createdAt', 'DESC')
+      .take(takeValue)
+      .skip(skip)
+      .getMany();
   }
 
   async findById(id: number) {
-    return this.feedPostRepository.findOneBy({ id });
+    return this.feedPostRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
   }
 
   async create(
@@ -45,6 +56,7 @@ export class FeedService {
 
   async update(id: number, updateFeedPostDto: UpdateFeedPostDto) {
     const post = await this.findById(id);
+    console.log(updateFeedPostDto, 'updateFeedPostDto');
     post.body = updateFeedPostDto.body;
     return this.feedPostRepository.save(post);
   }
