@@ -15,7 +15,10 @@ import { FeedService } from './feed.service';
 import { CreateFeedPostDto } from './dtos/create-feed-post.dto';
 import { UpdateFeedPostDto } from './dtos/update-feed-post.dto';
 import { FindOptionsDto } from './dtos/find-options.dto';
-import { JwtGuard } from '../auth/jwt.guard';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RoleEnum } from '../user/role.enum';
+import { RolesGuard } from "../auth/guards/roles.guard";
 
 @Controller('feed')
 export class FeedController {
@@ -33,8 +36,9 @@ export class FeedController {
     return this.feedService.findPost(findOptions);
   }
 
+  @Roles(RoleEnum.ADMIN)
   @Post()
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard,RolesGuard)
   async create(
     @Body(ValidationPipe) createFeedPostDto: CreateFeedPostDto,
     @Req() req,
