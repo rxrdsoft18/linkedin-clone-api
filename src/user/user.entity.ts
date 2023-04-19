@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { RoleEnum } from './role.enum';
-import { FeedPostEntity } from "../feed/entities/feed-post.entity";
+import { FeedPostEntity } from '../feed/entities/feed-post.entity';
+import { FriendRequestEntity } from '../friend-request/friend-request.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -27,19 +28,19 @@ export class UserEntity {
 
   @OneToMany(() => FeedPostEntity, (feedPostEntity) => feedPostEntity.author)
   feedPosts: FeedPostEntity[];
-  //
-  // @OneToMany(
-  //   () => FriendRequestEntity,
-  //   (friendRequestEntity) => friendRequestEntity.creator,
-  // )
-  // sentFriendRequests: FriendRequestEntity[];
-  //
-  // @OneToMany(
-  //   () => FriendRequestEntity,
-  //   (friendRequestEntity) => friendRequestEntity.receiver,
-  // )
-  // receivedFriendRequests: FriendRequestEntity[];
-  //
+
+  @OneToMany(
+    () => FriendRequestEntity,
+    (friendRequestEntity) => friendRequestEntity.creator,
+  )
+  sentFriendRequests: FriendRequestEntity[];
+
+  @OneToMany(
+    () => FriendRequestEntity,
+    (friendRequestEntity) => friendRequestEntity.receiver,
+  )
+  receivedFriendRequests: FriendRequestEntity[];
+
   // @ManyToMany(
   //   () => ConversationEntity,
   //   (conversationEntity) => conversationEntity.users,

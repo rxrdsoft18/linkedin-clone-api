@@ -3,13 +3,15 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Post,
-  Req, Res,
+  Req,
+  Res,
   UploadedFile,
   UseGuards,
-  UseInterceptors
-} from "@nestjs/common";
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -47,5 +49,11 @@ export class UserController {
   async getImage(@Req() req, @Res() res) {
     const image = await this.userService.findImageNameByUserId(req.user.id);
     return res.sendFile(image, { root: 'uploads' });
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id')
+  async getUserById(@Param('id') id: number) {
+    return this.userService.findById(id);
   }
 }

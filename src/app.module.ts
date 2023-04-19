@@ -7,6 +7,7 @@ import { configSchema } from './config.schema';
 import { FeedModule } from './feed/feed.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { FriendRequestModule } from './friend-request/friend-request.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { UserModule } from './user/user.module';
     FeedModule,
     AuthModule,
     UserModule,
+    FriendRequestModule,
   ],
   controllers: [AppController],
   providers: [AppService],
