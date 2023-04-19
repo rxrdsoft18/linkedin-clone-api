@@ -5,11 +5,11 @@ import {
   MaxFileSizeValidator,
   ParseFilePipe,
   Post,
-  Req,
+  Req, Res,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+  UseInterceptors
+} from "@nestjs/common";
 import { UserService } from './user.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -37,11 +37,15 @@ export class UserController {
     file: Express.Multer.File,
     @Req() req,
   ) {
+    console.log(req.user);
+    await this.userService.removeImageByImageName(req.user.id);
     return this.userService.updateUserImageById(req.user.id, file.filename);
   }
 
+  @UseGuards(JwtGuard)
   @Get('image')
-  async getImage() {
-    return 'image';
+  async getImage(@Req() req, @Res() res) {
+    const image = await this.userService.findImageNameByUserId(req.user.id);
+    return res.sendFile(image, { root: 'uploads' });
   }
 }
