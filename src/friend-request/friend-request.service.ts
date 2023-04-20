@@ -75,4 +75,11 @@ export class FriendRequestService {
       status,
     });
   }
+
+  async getFriendRequestsFromRecipients(id: number) {
+    console.log(id, 'id');
+    return this.friendRequestRepository.find({
+      where: [{ receiver: { id } }],
+    });
+  }
 }

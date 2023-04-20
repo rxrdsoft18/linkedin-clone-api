@@ -1,7 +1,18 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, Req, UseGuards, ValidationPipe } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { FriendRequestService } from './friend-request.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { UpdateFriendRequestStatusDto } from "./dtos/update-friend-request-status.dto";
+import { UpdateFriendRequestStatusDto } from './dtos/update-friend-request-status.dto';
 
 @Controller('friend-request')
 export class FriendRequestController {
@@ -34,6 +45,14 @@ export class FriendRequestController {
     return this.friendRequestService.respondToFriendRequest(
       friendRequestId,
       body.status,
+    );
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('me/received-requests')
+  async getFriendRequestsFromRecipients(@Req() req) {
+    return this.friendRequestService.getFriendRequestsFromRecipients(
+      req.user.id,
     );
   }
 }
