@@ -39,8 +39,8 @@ export class FeedController {
   @Get()
   @UseGuards(JwtGuard)
   async findSelected(@Query() findOptions: FindOptionsDto) {
-    console.log(findOptions);
-    return this.feedService.findPost(findOptions);
+    // console.log(findOptions);
+    return this.feedService.findPosts(findOptions);
   }
 
   @Roles(RoleEnum.ADMIN, RoleEnum.PREMIUM)

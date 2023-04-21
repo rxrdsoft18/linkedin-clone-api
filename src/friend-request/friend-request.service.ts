@@ -15,12 +15,29 @@ export class FriendRequestService {
   ) {}
 
   async getFriendRequestStatus(receiverId: number, creatorId: number) {
-    return this.friendRequestRepository.findOne({
+    if (receiverId === creatorId) {
+      throw new BadRequestException(
+        'You cannot get the status of a friend request to yourself',
+      );
+    }
+
+    const friendRequest = await this.friendRequestRepository.findOne({
       where: [
         { creator: { id: creatorId }, receiver: { id: receiverId } },
         { creator: { id: receiverId }, receiver: { id: creatorId } },
       ],
+      relations: ['receiver', 'creator'],
     });
+
+    if (!friendRequest) {
+      return { status: FriendRequestStatus.NOT_SENT };
+    }
+
+    if (friendRequest?.receiver.id === creatorId) {
+      return { status: FriendRequestStatus.WAITING_CURRENT_USER_RESPONSE };
+    }
+
+    return { status: friendRequest.status };
   }
 
   async hasRequestBeenSentOrReceived(creatorId: number, receiverId: number) {
@@ -76,10 +93,10 @@ export class FriendRequestService {
     });
   }
 
-  async getFriendRequestsFromRecipients(id: number) {
-    console.log(id, 'id');
+  async getFriendRequestsFromRecipients(currentUserId: number) {
     return this.friendRequestRepository.find({
-      where: [{ receiver: { id } }],
+      where: [{ receiver: { id: currentUserId } }],
+      relations: ['receiver', 'creator'],
     });
   }
 }

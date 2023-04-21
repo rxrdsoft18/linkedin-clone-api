@@ -31,7 +31,7 @@ export class FriendRequestController {
     @Req() req,
   ) {
     return this.friendRequestService.getFriendRequestStatus(
-      receiverId,
+      +receiverId,
       req.user.id,
     );
   }

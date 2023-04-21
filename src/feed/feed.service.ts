@@ -21,7 +21,7 @@ export class FeedService {
   //   return this.feedPostRepository.find();
   // }
 
-  findPost(findOptions: FindOptionsDto) {
+  findPosts(findOptions: FindOptionsDto) {
     const { take, skip } = findOptions;
     const takeValue = take > 20 ? 20 : take;
     // return this.feedPostRepository

@@ -8,6 +8,8 @@ import { FeedModule } from './feed/feed.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { FriendRequestModule } from './friend-request/friend-request.module';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionFilter } from './core/all-exception.filter';
 
 @Module({
   imports: [
@@ -36,6 +38,12 @@ import { FriendRequestModule } from './friend-request/friend-request.module';
     FriendRequestModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}
