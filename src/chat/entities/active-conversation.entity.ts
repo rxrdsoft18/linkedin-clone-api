@@ -8,9 +8,6 @@ export class ActiveConversationEntity {
   @Column()
   socketId: string;
 
-  @Column()
+  @Column({ unique: true })
   userId: number;
-
-  @Column()
-  conversationId: number;
 }

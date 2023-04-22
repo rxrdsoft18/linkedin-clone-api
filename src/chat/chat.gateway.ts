@@ -13,6 +13,8 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 import { AuthService } from '../auth/auth.service';
 import { ConversationService } from './conversation.service';
 import { UserInterface } from '../user/user.interface';
+import { ActiveConversationInterface } from './interfaces/active-conversation.interface';
+import { FriendRequestService } from '../friend-request/friend-request.service';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -22,6 +24,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly authService: AuthService,
     private readonly conversationService: ConversationService,
+    private readonly friendRequestService: FriendRequestService,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -36,9 +39,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.handleDisconnect(socket);
     } else {
       socket.data.user = user;
+
+      await this.setActiveConversationUser(socket);
+
+      await this.createConversations(socket, user.id);
+
       await this.getConversationsByUserId(socket, user.id);
     }
-    console.log(socket.handshake.headers, 'headers');
+  }
+
+  async createConversations(socket: Socket, userId: number) {
+    const friends = await this.friendRequestService.getMyFriends(userId);
+    for (const friend of friends) {
+      await this.conversationService.createConversation(
+        socket.data.user,
+        friend,
+      );
+    }
   }
 
   async getConversationsByUserId(socket: Socket, userId: number) {
@@ -48,19 +65,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(socket.id).emit('conversations', conversations);
   }
 
+  async setActiveConversationUser(socket: Socket) {
+    const { user } = socket.data;
+
+    const activeConversation: ActiveConversationInterface = {
+      socketId: socket.id,
+      userId: user.id,
+    };
+
+    await this.conversationService.setActiveConversationUser(
+      activeConversation,
+    );
+  }
+
   handleDisconnect(socket: Socket): any {
     console.log('disconnected');
   }
 
-  @SubscribeMessage('createConversation')
-  async createConversation(socket: Socket, friend: UserInterface) {
-    await this.conversationService.createConversation(socket.data.user, friend);
-    await this.getConversationsByUserId(socket, socket.data.user.id);
-  }
-
   @SubscribeMessage('sendMessage')
   async handleSendMessage(socket: Socket, newMessage: NewMessageDto) {
-    if (!newMessage || !newMessage.conversationId) {
+    if (!newMessage) {
       return;
     }
     const { user } = socket.data;
@@ -69,8 +93,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user,
     );
 
-    console.log(createdMessage, 'createdMessage');
+    const friendId = createdMessage.conversation.users.find(
+      (user) => user.id !== createdMessage.user.id,
+    ).id;
 
-    this.server.emit('newMessage', newMessage);
+    const friendSocketId =
+      await this.conversationService.getActiveConversationUser(friendId);
+
+    if (!friendSocketId) {
+      return;
+    }
+
+    const { id, message, user: creator, conversation } = createdMessage;
+
+    this.server.to(friendSocketId.socketId).emit('newMessage', {
+      id,
+      message,
+      creatorId: creator.id,
+      conversationId: conversation.id,
+    });
   }
 }

@@ -7,6 +7,8 @@ import { ConversationInterface } from './interfaces/conversation.interface';
 import { NewMessageDto } from './dtos/new-message.dto';
 import { MessageInterface } from './interfaces/message.interface';
 import { MessageEntity } from './entities/message.entity';
+import { ActiveConversationEntity } from './entities/active-conversation.entity';
+import { ActiveConversationInterface } from './interfaces/active-conversation.interface';
 
 @Injectable()
 export class ConversationService {
@@ -15,6 +17,8 @@ export class ConversationService {
     private readonly conversationRepository: Repository<ConversationEntity>,
     @InjectRepository(MessageEntity)
     private readonly messageRepository: Repository<MessageEntity>,
+    @InjectRepository(ActiveConversationEntity)
+    private readonly activeConversationRepository: Repository<ActiveConversationEntity>,
   ) {}
 
   getConversation(
@@ -92,5 +96,20 @@ export class ConversationService {
       conversation,
     };
     return this.messageRepository.save(message);
+  }
+
+  async setActiveConversationUser(
+    activeConversation: ActiveConversationInterface,
+  ) {
+    await this.activeConversationRepository.upsert(
+      [activeConversation],
+      ['userId'],
+    );
+  }
+
+  async getActiveConversationUser(
+    userId: number,
+  ): Promise<ActiveConversationEntity> {
+    return this.activeConversationRepository.findOne({ where: { userId } });
   }
 }

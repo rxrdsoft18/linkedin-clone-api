@@ -7,10 +7,12 @@ import { ConversationEntity } from './entities/conversation.entity';
 import { AuthModule } from '../auth/auth.module';
 import { ConversationService } from './conversation.service';
 import { ActiveConversationEntity } from './entities/active-conversation.entity';
+import { FriendRequestModule } from '../friend-request/friend-request.module';
 
 @Module({
   imports: [
     AuthModule,
+    FriendRequestModule,
     TypeOrmModule.forFeature([
       MessageEntity,
       ConversationEntity,
