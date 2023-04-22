@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { FriendRequestModule } from './friend-request/friend-request.module';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionFilter } from './core/all-exception.filter';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AllExceptionFilter } from './core/all-exception.filter';
     AuthModule,
     UserModule,
     FriendRequestModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [

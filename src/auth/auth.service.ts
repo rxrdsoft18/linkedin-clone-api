@@ -5,6 +5,7 @@ import { RegisterDto } from './dtos/register.dto';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from '../user/user.entity';
+import { UserInterface } from '../user/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -54,5 +55,14 @@ export class AuthService {
       email,
       password: hashedPassword,
     });
+  }
+
+  async getJwtUser(token: string): Promise<UserInterface> {
+    if (!token) {
+      return null;
+    }
+
+    const { user } = await this.jwtService.verifyAsync(token);
+    return user;
   }
 }

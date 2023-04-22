@@ -26,8 +26,13 @@ export class UserService {
     });
   }
 
+  async doesUserExist(email: string): Promise<boolean> {
+    const user = await this.findByEmail(email);
+    return user !== undefined;
+  }
+
   async create(user: Readonly<NewUserDto>) {
-    const existingUser = await this.findByEmail(user.email);
+    const existingUser = await this.doesUserExist(user.email);
 
     if (existingUser) {
       throw new ConflictException('User already exists');

@@ -55,4 +55,10 @@ export class FriendRequestController {
       req.user.id,
     );
   }
+
+  @Get('friends/my')
+  @UseGuards(JwtGuard)
+  async getMyFriends(@Req() req) {
+    return this.friendRequestService.getMyFriends(req.user.id);
+  }
 }

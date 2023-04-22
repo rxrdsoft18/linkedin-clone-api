@@ -99,4 +99,29 @@ export class FriendRequestService {
       relations: ['receiver', 'creator'],
     });
   }
+
+  async getMyFriends(currentUserId: number) {
+    const friends = await this.friendRequestRepository.find({
+      where: [
+        {
+          receiver: { id: currentUserId },
+          status: FriendRequestStatus.ACCEPTED,
+        },
+        {
+          creator: { id: currentUserId },
+          status: FriendRequestStatus.ACCEPTED,
+        },
+      ],
+      relations: ['receiver', 'creator'],
+    });
+
+    return friends.map((friend) => this.getFriend(friend, currentUserId));
+  }
+
+  private getFriend(friend: FriendRequestEntity, currentUserId: number) {
+    if (friend.creator.id === currentUserId) {
+      return friend.receiver;
+    }
+    return friend.creator;
+  }
 }

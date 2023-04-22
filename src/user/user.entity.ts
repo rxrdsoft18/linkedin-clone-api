@@ -1,7 +1,15 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { RoleEnum } from './role.enum';
 import { FeedPostEntity } from '../feed/entities/feed-post.entity';
 import { FriendRequestEntity } from '../friend-request/friend-request.entity';
+import { MessageEntity } from '../chat/entities/message.entity';
+import { ConversationEntity } from '../chat/entities/conversation.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -41,12 +49,12 @@ export class UserEntity {
   )
   receivedFriendRequests: FriendRequestEntity[];
 
-  // @ManyToMany(
-  //   () => ConversationEntity,
-  //   (conversationEntity) => conversationEntity.users,
-  // )
-  // conversations: ConversationEntity[];
-  //
-  // @OneToMany(() => MessageEntity, (messageEntity) => messageEntity.user)
-  // messages: MessageEntity[];
+  @ManyToMany(
+    () => ConversationEntity,
+    (conversationEntity) => conversationEntity.users,
+  )
+  conversations: ConversationEntity[];
+
+  @OneToMany(() => MessageEntity, (messageEntity) => messageEntity.user)
+  messages: MessageEntity[];
 }
