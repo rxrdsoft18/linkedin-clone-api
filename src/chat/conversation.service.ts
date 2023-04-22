@@ -57,27 +57,25 @@ export class ConversationService {
       .getMany();
   }
 
-  getUsersInConversation(
-    conversationId: number,
-  ): Promise<ConversationEntity[]> {
+  getUsersInConversation(conversationId: number): Promise<ConversationEntity> {
     return this.conversationRepository
       .createQueryBuilder('conversation')
       .innerJoinAndSelect('conversation.users', 'user')
       .where('conversation.id = :conversationId', { conversationId })
-      .getMany();
+      .getOne();
   }
   async getConversationsWithUsers(userId: number) {
     const conversations = await this.getConversationsForUser(userId);
 
     console.log(conversations, 'getConversationsWithUsers');
 
-    return (
-      await Promise.all(
-        conversations.map(async (conversation) => {
-          return await this.getUsersInConversation(conversation.id);
-        }),
-      )
-    ).flat();
+    return await Promise.all(
+      conversations.map(async (conversation) => {
+        const result = await this.getUsersInConversation(conversation.id);
+        console.log(result, 'result');
+        return result;
+      }),
+    );
   }
 
   async createMessage(newMessage: NewMessageDto, user: UserInterface) {
