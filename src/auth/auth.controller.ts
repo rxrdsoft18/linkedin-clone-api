@@ -2,17 +2,21 @@ import {
   Body,
   Controller,
   HttpCode,
-  HttpStatus,
+  HttpStatus, Inject,
   Post,
-  ValidationPipe,
-} from '@nestjs/common';
+  ValidationPipe
+} from "@nestjs/common";
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
+import { AuthServiceInterface } from './interfaces/auth.service.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject(AuthService)
+    private readonly authService: AuthServiceInterface,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)

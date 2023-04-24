@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserEntity } from '../../user/user.entity';
+import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity('feed_posts')
 export class FeedPostEntity {

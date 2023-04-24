@@ -5,11 +5,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { RoleEnum } from './role.enum';
-import { FeedPostEntity } from '../feed/entities/feed-post.entity';
-import { FriendRequestEntity } from '../friend-request/friend-request.entity';
-import { MessageEntity } from '../chat/entities/message.entity';
-import { ConversationEntity } from '../chat/entities/conversation.entity';
+import { RoleEnum } from '../role.enum';
+import { FeedPostEntity } from '../../feed/entities/feed-post.entity';
+import { FriendRequestEntity } from '../../friend-request/entities/friend-request.entity';
+import { MessageEntity } from '../../chat/entities/message.entity';
+import { ConversationEntity } from '../../chat/entities/conversation.entity';
 
 @Entity('users')
 export class UserEntity {

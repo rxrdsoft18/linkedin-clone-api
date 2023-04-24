@@ -1,5 +1,5 @@
-import { FeedPostEntity } from '../feed/entities/feed-post.entity';
-import { RoleEnum } from './role.enum';
+import { FeedPostEntity } from '../../feed/entities/feed-post.entity';
+import { RoleEnum } from '../role.enum';
 
 export interface UserInterface {
   id?: number;

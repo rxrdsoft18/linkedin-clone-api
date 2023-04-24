@@ -1,17 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { FeedPostEntity } from './entities/feed-post.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFeedPostDto } from './dtos/create-feed-post.dto';
 import { UpdateFeedPostDto } from './dtos/update-feed-post.dto';
 import { FindOptionsDto } from './dtos/find-options.dto';
-import { UserInterface } from '../user/user.interface';
+import { UserInterface } from '../user/interfaces/user.interface';
+import { FeedRepositoryInterface } from './interfaces/feed.repository.interface';
 
 @Injectable()
 export class FeedService {
   constructor(
-    @InjectRepository(FeedPostEntity)
-    private readonly feedPostRepository: Repository<FeedPostEntity>,
+    @Inject('FeedRepositoryInterface')
+    private readonly feedPostRepository: FeedRepositoryInterface,
   ) {}
 
   // async findAll(findOptions: FindOptionsDto) {
@@ -24,23 +22,11 @@ export class FeedService {
   findPosts(findOptions: FindOptionsDto) {
     const { take, skip } = findOptions;
     const takeValue = take > 20 ? 20 : take;
-    // return this.feedPostRepository
-    //   .findAndCount({ take: takeValue, skip })
-    //   .then(([posts]) => {
-    //     return posts;
-    //   });
-
-    return this.feedPostRepository
-      .createQueryBuilder('posts')
-      .leftJoinAndSelect('posts.author', 'author')
-      .orderBy('posts.createdAt', 'DESC')
-      .take(takeValue)
-      .skip(skip)
-      .getMany();
+    return this.feedPostRepository.getFeedPosts(takeValue, skip);
   }
 
   async findById(id: number) {
-    return this.feedPostRepository.findOne({
+    return this.feedPostRepository.findByCondition({
       where: { id },
       relations: ['author'],
     });
@@ -56,7 +42,6 @@ export class FeedService {
 
   async update(id: number, updateFeedPostDto: UpdateFeedPostDto) {
     const post = await this.findById(id);
-    console.log(updateFeedPostDto, 'updateFeedPostDto');
     post.body = updateFeedPostDto.body;
     return this.feedPostRepository.save(post);
   }

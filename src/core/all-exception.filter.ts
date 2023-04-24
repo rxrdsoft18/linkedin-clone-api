@@ -1,16 +1,7 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
-import {
-  CustomHttpExceptionResponse,
-  HttpExceptionResponse,
-} from './interfaces/http-exception-response.interface';
-import { Request } from 'express';
-import * as fs from 'fs';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
+import { CustomHttpExceptionResponse, HttpExceptionResponse } from "./interfaces/http-exception-response.interface";
+import { Request } from "express";
+import * as fs from "fs";
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
@@ -61,8 +52,7 @@ export class AllExceptionFilter implements ExceptionFilter {
   private getErrorLog(errorResponse: CustomHttpExceptionResponse) {
     const { statusCode, error, message, path, timestamp, method } =
       errorResponse;
-    const errorLog = `Response Code: ${statusCode} | Error: ${error} | Message: ${message} \n | Path: ${path} | Timestamp: ${timestamp} | Method: ${method}\n\n`;
-    return errorLog;
+    return `Response Code: ${statusCode} | Error: ${error} | Message: ${message} \n | Path: ${path} | Timestamp: ${timestamp} | Method: ${method}\n\n`;
   }
 
   private writeErrorLog(errorLog: string) {

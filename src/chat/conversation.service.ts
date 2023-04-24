@@ -1,38 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConversationEntity } from './entities/conversation.entity';
-import { Repository } from 'typeorm';
-import { UserInterface } from '../user/user.interface';
+import { UserInterface } from '../user/interfaces/user.interface';
 import { ConversationInterface } from './interfaces/conversation.interface';
 import { NewMessageDto } from './dtos/new-message.dto';
 import { MessageInterface } from './interfaces/message.interface';
-import { MessageEntity } from './entities/message.entity';
 import { ActiveConversationEntity } from './entities/active-conversation.entity';
 import { ActiveConversationInterface } from './interfaces/active-conversation.interface';
+import { ConversationRepositoryInterface } from './interfaces/conversation.repository.interface';
+import { MessageRepositoryInterface } from './interfaces/message.repository.interface';
+import { ActiveConversationRepositoryInterface } from './interfaces/active-conversation.repository.interface';
 
 @Injectable()
 export class ConversationService {
   constructor(
-    @InjectRepository(ConversationEntity)
-    private readonly conversationRepository: Repository<ConversationEntity>,
-    @InjectRepository(MessageEntity)
-    private readonly messageRepository: Repository<MessageEntity>,
-    @InjectRepository(ActiveConversationEntity)
-    private readonly activeConversationRepository: Repository<ActiveConversationEntity>,
+    @Inject('ConversationRepositoryInterface')
+    private readonly conversationRepository: ConversationRepositoryInterface,
+    @Inject('MessageRepositoryInterface')
+    private readonly messageRepository: MessageRepositoryInterface,
+    @Inject('ActiveConversationRepositoryInterface')
+    private readonly activeConversationRepository: ActiveConversationRepositoryInterface,
   ) {}
 
   getConversation(
     creatorId: number,
     friendId: number,
   ): Promise<ConversationEntity> {
-    return this.conversationRepository
-      .createQueryBuilder('conversation')
-      .leftJoin('conversation.users', 'user')
-      .where('user.id = :creatorId', { creatorId })
-      .orWhere('user.id = :friendId', { friendId })
-      .groupBy('conversation.id')
-      .having('COUNT(*) > 1')
-      .getOne();
+    return this.conversationRepository.getConversation(creatorId, friendId);
   }
 
   async createConversation(creator: UserInterface, friend: UserInterface) {
@@ -49,20 +42,11 @@ export class ConversationService {
   }
 
   getConversationsForUser(userId: number): Promise<ConversationEntity[]> {
-    return this.conversationRepository
-      .createQueryBuilder('conversation')
-      .leftJoin('conversation.users', 'user')
-      .where('user.id = :userId', { userId })
-      .orderBy('conversation.lastUpdated', 'DESC')
-      .getMany();
+    return this.conversationRepository.getConversationsForUser(userId);
   }
 
   getUsersInConversation(conversationId: number): Promise<ConversationEntity> {
-    return this.conversationRepository
-      .createQueryBuilder('conversation')
-      .innerJoinAndSelect('conversation.users', 'user')
-      .where('conversation.id = :conversationId', { conversationId })
-      .getOne();
+    return this.conversationRepository.getUsersInConversation(conversationId);
   }
   async getConversationsWithUsers(userId: number) {
     const conversations = await this.getConversationsForUser(userId);
@@ -81,7 +65,7 @@ export class ConversationService {
   async createMessage(newMessage: NewMessageDto, user: UserInterface) {
     if (!user) return;
 
-    const conversation = await this.conversationRepository.findOne({
+    const conversation = await this.conversationRepository.findByCondition({
       where: [{ id: newMessage.conversationId }],
       relations: ['users'],
     });
@@ -99,15 +83,16 @@ export class ConversationService {
   async setActiveConversationUser(
     activeConversation: ActiveConversationInterface,
   ) {
-    await this.activeConversationRepository.upsert(
-      [activeConversation],
-      ['userId'],
+    await this.activeConversationRepository.updateOrCreateActiveConversation(
+      activeConversation,
     );
   }
 
   async getActiveConversationUser(
     userId: number,
   ): Promise<ActiveConversationEntity> {
-    return this.activeConversationRepository.findOne({ where: { userId } });
+    return this.activeConversationRepository.findByCondition({
+      where: { userId },
+    });
   }
 }

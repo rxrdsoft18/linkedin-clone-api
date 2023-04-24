@@ -4,11 +4,12 @@ import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from '../user/user.entity';
-import { UserInterface } from '../user/user.interface';
+import { UserEntity } from '../user/entities/user.entity';
+import { UserInterface } from '../user/interfaces/user.interface';
+import { AuthServiceInterface } from './interfaces/auth.service.interface';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthServiceInterface {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
@@ -42,11 +43,11 @@ export class AuthService {
     return { token: jwt };
   }
 
-  async hashPassword(password: string) {
+  async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 12);
   }
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto): Promise<UserEntity> {
     const { firstName, lastName, email, password } = registerDto;
     const hashedPassword = await this.hashPassword(password);
     return this.userService.create({

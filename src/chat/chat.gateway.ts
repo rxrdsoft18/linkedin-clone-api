@@ -12,7 +12,7 @@ import { UseGuards } from '@nestjs/common';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { AuthService } from '../auth/auth.service';
 import { ConversationService } from './conversation.service';
-import { UserInterface } from '../user/user.interface';
+import { UserInterface } from '../user/interfaces/user.interface';
 import { ActiveConversationInterface } from './interfaces/active-conversation.interface';
 import { FriendRequestService } from '../friend-request/friend-request.service';
 

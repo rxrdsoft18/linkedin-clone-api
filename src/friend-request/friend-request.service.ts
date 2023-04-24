@@ -1,16 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { FriendRequestEntity } from './friend-request.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { FriendRequestEntity } from './entities/friend-request.entity';
 import { UserService } from '../user/user.service';
-import { UserInterface } from '../user/user.interface';
 import { FriendRequestStatus } from './friend-request-status.enum';
+import { FriendRequestRepositoryInterface } from './interfaces/friend-request.repository.interface';
 
 @Injectable()
 export class FriendRequestService {
   constructor(
-    @InjectRepository(FriendRequestEntity)
-    private readonly friendRequestRepository: Repository<FriendRequestEntity>,
+    @Inject('FriendRequestRepositoryInterface')
+    private readonly friendRequestRepository: FriendRequestRepositoryInterface,
     private readonly userService: UserService,
   ) {}
 
@@ -21,7 +19,7 @@ export class FriendRequestService {
       );
     }
 
-    const friendRequest = await this.friendRequestRepository.findOne({
+    const friendRequest = await this.friendRequestRepository.findByCondition({
       where: [
         { creator: { id: creatorId }, receiver: { id: receiverId } },
         { creator: { id: receiverId }, receiver: { id: creatorId } },
@@ -41,7 +39,7 @@ export class FriendRequestService {
   }
 
   async hasRequestBeenSentOrReceived(creatorId: number, receiverId: number) {
-    return this.friendRequestRepository.findOne({
+    return this.friendRequestRepository.findByCondition({
       where: [
         { creator: { id: creatorId }, receiver: { id: receiverId } },
         { creator: { id: receiverId }, receiver: { id: creatorId } },
@@ -72,7 +70,7 @@ export class FriendRequestService {
   }
 
   async getFriendRequestById(id: number) {
-    return this.friendRequestRepository.findOne({
+    return this.friendRequestRepository.findByCondition({
       where: { id },
     });
   }
@@ -94,14 +92,14 @@ export class FriendRequestService {
   }
 
   async getFriendRequestsFromRecipients(currentUserId: number) {
-    return this.friendRequestRepository.find({
+    return this.friendRequestRepository.findAll({
       where: [{ receiver: { id: currentUserId } }],
       relations: ['receiver', 'creator'],
     });
   }
 
   async getMyFriends(currentUserId: number) {
-    const friends = await this.friendRequestRepository.find({
+    const friends = await this.friendRequestRepository.findAll({
       where: [
         {
           receiver: { id: currentUserId },

@@ -1,26 +1,24 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { NewUserDto } from './dtos/new-user.dto';
-import { UserEntity } from './user.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
+import { UserRepositoryInterface } from './interfaces/user.repository.interface';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @Inject('UserRepositoryInterface')
+    private readonly userRepository: UserRepositoryInterface,
   ) {}
 
   async findByEmail(email: string) {
-    return this.userRepository.findOne({
+    return this.userRepository.findByCondition({
       where: { email },
       select: ['id', 'firstName', 'lastName', 'email', 'password', 'role'],
     });
   }
 
   async findById(id: number) {
-    return this.userRepository.findOne({
+    return this.userRepository.findByCondition({
       where: { id },
       relations: ['feedPosts'],
     });
@@ -43,13 +41,13 @@ export class UserService {
   }
 
   async updateUserImageById(id: number, imagePath: string) {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findByCondition({ where: { id } });
     user.imagePath = imagePath;
     return this.userRepository.save(user);
   }
 
   async findImageNameByUserId(id: number) {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findByCondition({ where: { id } });
     return user.imagePath;
   }
 
