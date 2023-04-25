@@ -9,9 +9,10 @@ import { ActiveConversationInterface } from './interfaces/active-conversation.in
 import { ConversationRepositoryInterface } from './interfaces/conversation.repository.interface';
 import { MessageRepositoryInterface } from './interfaces/message.repository.interface';
 import { ActiveConversationRepositoryInterface } from './interfaces/active-conversation.repository.interface';
+import { ConversationServiceInterface } from './interfaces/conversation.service.interface';
 
 @Injectable()
-export class ConversationService {
+export class ConversationService implements ConversationServiceInterface {
   constructor(
     @Inject('ConversationRepositoryInterface')
     private readonly conversationRepository: ConversationRepositoryInterface,
@@ -21,7 +22,7 @@ export class ConversationService {
     private readonly activeConversationRepository: ActiveConversationRepositoryInterface,
   ) {}
 
-  getConversation(
+  private getConversation(
     creatorId: number,
     friendId: number,
   ): Promise<ConversationEntity> {
@@ -41,17 +42,19 @@ export class ConversationService {
     return conversation;
   }
 
-  getConversationsForUser(userId: number): Promise<ConversationEntity[]> {
+  private getConversationsForUser(
+    userId: number,
+  ): Promise<ConversationEntity[]> {
     return this.conversationRepository.getConversationsForUser(userId);
   }
 
-  getUsersInConversation(conversationId: number): Promise<ConversationEntity> {
+  private getUsersInConversation(
+    conversationId: number,
+  ): Promise<ConversationEntity> {
     return this.conversationRepository.getUsersInConversation(conversationId);
   }
   async getConversationsWithUsers(userId: number) {
     const conversations = await this.getConversationsForUser(userId);
-
-    console.log(conversations, 'getConversationsWithUsers');
 
     return await Promise.all(
       conversations.map(async (conversation) => {

@@ -8,13 +8,15 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { NewMessageDto } from './dtos/new-message.dto';
-import { UseGuards } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { AuthService } from '../auth/auth.service';
 import { ConversationService } from './conversation.service';
-import { UserInterface } from '../user/interfaces/user.interface';
 import { ActiveConversationInterface } from './interfaces/active-conversation.interface';
 import { FriendRequestService } from '../friend-request/friend-request.service';
+import { AuthServiceInterface } from '../auth/interfaces/auth.service.interface';
+import { FriendRequestServiceInterface } from '../friend-request/interfaces/friend-request.service.interface';
+import { ConversationServiceInterface } from './interfaces/conversation.service.interface';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -22,9 +24,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
-    private readonly authService: AuthService,
-    private readonly conversationService: ConversationService,
-    private readonly friendRequestService: FriendRequestService,
+    @Inject(AuthService)
+    private readonly authService: AuthServiceInterface,
+    @Inject(ConversationService)
+    private readonly conversationService: ConversationServiceInterface,
+    @Inject(FriendRequestService)
+    private readonly friendRequestService: FriendRequestServiceInterface,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -35,7 +40,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const user = await this.authService.getJwtUser(jwt);
     if (!user) {
-      console.log('user not found');
       this.handleDisconnect(socket);
     } else {
       socket.data.user = user;

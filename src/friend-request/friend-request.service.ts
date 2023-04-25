@@ -3,13 +3,16 @@ import { FriendRequestEntity } from './entities/friend-request.entity';
 import { UserService } from '../user/user.service';
 import { FriendRequestStatus } from './friend-request-status.enum';
 import { FriendRequestRepositoryInterface } from './interfaces/friend-request.repository.interface';
+import { UserServiceInterface } from '../user/interfaces/user.service.interface';
+import { FriendRequestServiceInterface } from './interfaces/friend-request.service.interface';
 
 @Injectable()
-export class FriendRequestService {
+export class FriendRequestService implements FriendRequestServiceInterface {
   constructor(
     @Inject('FriendRequestRepositoryInterface')
     private readonly friendRequestRepository: FriendRequestRepositoryInterface,
-    private readonly userService: UserService,
+    @Inject(UserService)
+    private readonly userService: UserServiceInterface,
   ) {}
 
   async getFriendRequestStatus(receiverId: number, creatorId: number) {

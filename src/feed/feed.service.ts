@@ -4,20 +4,14 @@ import { UpdateFeedPostDto } from './dtos/update-feed-post.dto';
 import { FindOptionsDto } from './dtos/find-options.dto';
 import { UserInterface } from '../user/interfaces/user.interface';
 import { FeedRepositoryInterface } from './interfaces/feed.repository.interface';
+import { FeedServiceInterface } from './interfaces/feed.service.interface';
 
 @Injectable()
-export class FeedService {
+export class FeedService implements FeedServiceInterface {
   constructor(
     @Inject('FeedRepositoryInterface')
     private readonly feedPostRepository: FeedRepositoryInterface,
   ) {}
-
-  // async findAll(findOptions: FindOptionsDto) {
-  //   const { take, skip } = findOptions;
-  //   const takeValue = take > 20 ? 20 : take;
-  //
-  //   return this.feedPostRepository.find();
-  // }
 
   findPosts(findOptions: FindOptionsDto) {
     const { take, skip } = findOptions;

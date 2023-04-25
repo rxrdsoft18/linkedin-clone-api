@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
@@ -20,15 +21,14 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { RoleEnum } from '../user/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { IsCreatorGuard } from './guards/is-creator.guard';
+import { FeedServiceInterface } from './interfaces/feed.service.interface';
 
 @Controller('feed')
 export class FeedController {
-  constructor(private readonly feedService: FeedService) {}
-
-  // @Get()
-  // async findAll) {
-  //   return this.feedService.findAll();
-  // }
+  constructor(
+    @Inject(FeedService)
+    private readonly feedService: FeedServiceInterface,
+  ) {}
 
   @Get(':id')
   @UseGuards(JwtGuard)
@@ -39,7 +39,6 @@ export class FeedController {
   @Get()
   @UseGuards(JwtGuard)
   async findSelected(@Query() findOptions: FindOptionsDto) {
-    // console.log(findOptions);
     return this.feedService.findPosts(findOptions);
   }
 

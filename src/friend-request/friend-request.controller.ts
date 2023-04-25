@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -13,10 +14,14 @@ import {
 import { FriendRequestService } from './friend-request.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { UpdateFriendRequestStatusDto } from './dtos/update-friend-request-status.dto';
+import { FriendRequestServiceInterface } from './interfaces/friend-request.service.interface';
 
 @Controller('friend-request')
 export class FriendRequestController {
-  constructor(private readonly friendRequestService: FriendRequestService) {}
+  constructor(
+    @Inject(FriendRequestService)
+    private readonly friendRequestService: FriendRequestServiceInterface,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Post('send/:receiverId')
