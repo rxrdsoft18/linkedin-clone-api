@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dtos/login.dto';
 import { RegisterDto } from './dtos/register.dto';
@@ -7,12 +7,14 @@ import * as bcrypt from 'bcrypt';
 import { UserEntity } from '../user/entities/user.entity';
 import { UserInterface } from '../user/interfaces/user.interface';
 import { AuthServiceInterface } from './interfaces/auth.service.interface';
+import { UserServiceInterface } from '../user/interfaces/user.service.interface';
 
 @Injectable()
 export class AuthService implements AuthServiceInterface {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService: UserService,
+    @Inject(UserService)
+    private readonly userService: UserServiceInterface,
   ) {}
 
   async validateUser(

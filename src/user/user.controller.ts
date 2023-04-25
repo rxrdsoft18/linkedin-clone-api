@@ -2,6 +2,7 @@ import {
   Controller,
   FileTypeValidator,
   Get,
+  Inject,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -15,10 +16,14 @@ import {
 import { UserService } from './user.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UserServiceInterface } from './interfaces/user.service.interface';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @Inject(UserService)
+    private readonly userService: UserServiceInterface,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Post('upload')

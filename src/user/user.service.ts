@@ -2,9 +2,10 @@ import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { NewUserDto } from './dtos/new-user.dto';
 import * as fs from 'fs';
 import { UserRepositoryInterface } from './interfaces/user.repository.interface';
+import { UserServiceInterface } from './interfaces/user.service.interface';
 
 @Injectable()
-export class UserService {
+export class UserService implements UserServiceInterface {
   constructor(
     @Inject('UserRepositoryInterface')
     private readonly userRepository: UserRepositoryInterface,
@@ -26,12 +27,11 @@ export class UserService {
 
   async doesUserExist(email: string): Promise<boolean> {
     const user = await this.findByEmail(email);
-    return user !== undefined;
+    return user !== null;
   }
 
   async create(user: Readonly<NewUserDto>) {
     const existingUser = await this.doesUserExist(user.email);
-
     if (existingUser) {
       throw new ConflictException('User already exists');
     }
