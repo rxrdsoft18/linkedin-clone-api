@@ -41,6 +41,15 @@ $ yarn run start:dev
 $ yarn run start:prod
 ```
 
+## Build Docker Image
+
+```bash
+$ Enter to docker-compose.yml file and uncomment linkedin-api service
+$ Environment variable POSTGRES_HOST must be postgres
+$ docker-compose up -d
+```
+
+
 ## Test
 
 ```bash
@@ -50,6 +59,4 @@ $ yarn run test
 # e2e tests
 $ yarn run test:e2e
 
-# test coverage
-$ yarn run test:cov
 ```
